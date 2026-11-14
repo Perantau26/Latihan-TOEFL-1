@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOEFL Reading Comprehension — Practice 1 (Online Simulation)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .passage-font { font-family: 'Merriweather', Georgia, serif; }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden select-none">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between shadow-md z-20 shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="bg-blue-600 text-white font-bold px-2.5 py-1 rounded text-sm tracking-wide">TOEFL ITP</div>
+      <div>
+        <h1 class="text-sm sm:text-base font-semibold leading-tight">Section 3: Reading Comprehension — Practice 1</h1>
+        <p class="text-xs text-slate-400 hidden sm:block">The Master TOEFL • 50 Questions • 55 Minutes</p>
+      </div>
+    </div>
+
+    <div id="examControls" class="hidden items-center gap-2 sm:gap-4">
+      <div class="hidden md:flex items-center gap-1 bg-slate-800 px-2.5 py-1 rounded text-xs">
+        <span class="text-slate-400">Terjawab:</span>
+        <span id="answeredCount" class="font-bold text-emerald-400">0</span>
+        <span class="text-slate-400">/ 50</span>
+      </div>
+
+      <button onclick="toggleQuestionGrid()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded text-xs sm:text-sm font-medium flex items-center gap-1.5 transition">
+        <span>Daftar Soal</span>
+        <span id="currentQBadge" class="bg-blue-600 px-1.5 py-0.5 rounded text-xs font-bold">1/50</span>
+      </button>
+
+      <div id="timerBox" class="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded">
+        <span class="text-xs text-slate-400 hidden sm:inline">Sisa Waktu:</span>
+        <span id="timerDisplay" class="font-mono font-bold text-sm sm:text-base text-amber-400">55:00</span>
+        <button id="pauseBtn" onclick="togglePause()" title="Jeda / Lanjutkan Waktu" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-slate-200">Jeda</button>
+      </div>
+
+      <button id="finishBtn" onclick="confirmSubmit()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 sm:px-4 py-1.5 rounded text-xs sm:text-sm font-semibold shadow transition">
+        Selesai
+      </button>
+    </div>
+  </header>
+
+  <!-- START / DIRECTIONS SCREEN -->
+  <main id="startScreen" class="flex-1 overflow-y-auto flex items-center justify-center p-4">
+    <div class="max-w-2xl w-full bg-white rounded-xl shadow-lg border border-slate-200 p-6 sm:p-8">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-5">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Simulasi Ujian Daring</span>
+          <h2 class="text-2xl font-bold text-slate-900 mt-1">Reading Comprehension — Practice 1</h2>
+        </div>
+        <div class="text-right">
+          <div class="text-sm font-semibold text-slate-700">50 Soal</div>
+          <div class="text-xs text-slate-500">Waktu: 55 Menit</div>
+        </div>
+      </div>
+
+      <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg mb-6 text-sm text-slate-700 space-y-2">
+        <p class="font-bold text-slate-900">Directions:</p>
+        <p>In this section you will read several passages. Each one is followed by several questions about it. For questions 1–50, you are to choose the one best answer, (A), (B), (C), or (D), to each question.</p>
+        <p>Answer all questions following a passage on the basis of what is stated or implied in that passage.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-6 text-sm">
+        <div class="border border-slate-200 rounded-lg p-3.5 bg-slate-50">
+          <div class="font-semibold text-slate-900 mb-1">Fitur Simulasi</div>
+          <ul class="text-slate-600 space-y-1 text-xs">
+            <li>• Tampilan layar terpisah (Teks bacaan di kiri, soal di kanan)</li>
+            <li>• Penomoran baris lengkap sesuai buku asli</li>
+            <li>• Tombol <em>Tandai Ragu-ragu</em> & navigasi 50 nomor soal</li>
+            <li>• Konversi skor skala TOEFL ITP & pembahasan resmi</li>
+          </ul>
+        </div>
+        <div class="border border-slate-200 rounded-lg p-3.5 bg-slate-50">
+          <div class="font-semibold text-slate-900 mb-1">Pilih Mode Pengerjaan</div>
+          <div class="space-y-2 mt-2">
+            <label class="flex items-center gap-2 cursor-pointer text-xs">
+              <input type="radio" name="examMode" value="timed" checked class="text-blue-600" />
+              <span><strong>Mode Ujian Asli</strong> (Timer mundur 55 menit)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-xs">
+              <input type="radio" name="examMode" value="untimed" class="text-blue-600" />
+              <span><strong>Mode Latihan Santai</strong> (Tanpa batas waktu)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="startExam()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition text-base">
+        Mulai Mengerjakan Simulasi →
+      </button>
+    </div>
+  </main>
+
+  <!-- PAUSE OVERLAY -->
+  <div id="pauseOverlay" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-sm w-full text-center shadow-2xl">
+      <h3 class="text-xl font-bold text-slate-900 mb-2">Simulasi Dijeda</h3>
+      <p class="text-sm text-slate-600 mb-5">Waktu berhenti sementara. Klik tombol di bawah untuk melanjutkan ujian.</p>
+      <button onclick="togglePause()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg">
+        Lanjutkan Ujian
+      </button>
+    </div>
+  </div>
+
+  <!-- QUESTION GRID MODAL -->
+  <div id="gridModal" class="hidden fixed inset-0 bg-slate-900/60 z-30 flex items-center justify-center p-4" onclick="if(event.target===this) toggleQuestionGrid()">
+    <div class="bg-white rounded-xl max-w-xl w-full p-5 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between border-b pb-3 mb-4">
+        <h3 class="font-bold text-slate-900">Navigasi Nomor Soal (1 – 50)</h3>
+        <button onclick="toggleQuestionGrid()" class="text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
+      </div>
+      <div class="flex flex-wrap gap-3 text-xs mb-4">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-600 inline-block"></span> Sedang dibuka</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Sudah dijawab</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-400 inline-block"></span> Ragu-ragu</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-200 inline-block"></span> Belum dijawab</span>
+      </div>
+      <div id="questionGridContainer" class="grid grid-cols-10 gap-1.5 max-h-72 overflow-y-auto p-1"></div>
+    </div>
+  </div>
+
+  <!-- MAIN EXAM SPLIT VIEW -->
+  <main id="examScreen" class="hidden flex-1 flex-col md:flex-row overflow-hidden">
+    <!-- LEFT PANE: PASSAGE -->
+    <section class="w-full md:w-1/2 h-1/2 md:h-full bg-white border-b md:border-b-0 md:border-r border-slate-300 flex flex-col">
+      <div class="bg-slate-100 border-b border-slate-200 px-4 py-2 flex items-center justify-between shrink-0">
+        <div>
+          <span id="passageBadge" class="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">Passage 1 (Questions 1–10)</span>
+          <span id="passageTitle" class="text-xs font-semibold text-slate-600 ml-2">Global Warming</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button onclick="changeFontSize(-1)" class="px-2 py-0.5 text-xs bg-white border border-slate-300 rounded hover:bg-slate-50 font-semibold" title="Perkecil Teks">A-</button>
+          <button onclick="changeFontSize(1)" class="px-2 py-0.5 text-xs bg-white border border-slate-300 rounded hover:bg-slate-50 font-semibold" title="Perbesar Teks">A+</button>
+        </div>
+      </div>
+
+      <div id="passageContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 passage-font text-slate-800 leading-relaxed select-text" style="font-size: 15px;">
+      </div>
+    </section>
+
+    <!-- RIGHT PANE: QUESTION & OPTIONS -->
+    <section class="w-full md:w-1/2 h-1/2 md:h-full bg-slate-50 flex flex-col">
+      <div class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shrink-0">
+        <span id="questionNumberHeader" class="font-bold text-slate-900 text-sm sm:text-base">Question 1 of 50</span>
+        <button id="flagBtn" onclick="toggleFlag()" class="text-xs px-2.5 py-1 rounded border border-slate-300 hover:bg-amber-50 text-slate-600 flex items-center gap-1 transition">
+          <span>⚑</span> <span id="flagBtnText">Tandai Ragu-ragu</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div id="questionText" class="text-base sm:text-lg font-medium text-slate-900 mb-5 leading-snug select-text"></div>
+        <div id="optionsContainer" class="space-y-3"></div>
+        <div id="reviewExplanationBox" class="hidden mt-6 p-4 rounded-lg border text-sm"></div>
+      </div>
+
+      <div class="bg-white border-t border-slate-200 px-4 py-3 flex items-center justify-between shrink-0">
+        <button id="prevBtn" onclick="prevQuestion()" class="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed transition">
+          ← Sebelumnya
+        </button>
+
+        <button id="backToResultBtn" onclick="showResults()" class="hidden px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm">
+          Lihat Ringkasan Skor
+        </button>
+
+        <button id="nextBtn" onclick="nextQuestion()" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition">
+          Berikutnya →
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- RESULTS & REVIEW SCREEN -->
+  <main id="resultScreen" class="hidden flex-1 overflow-y-auto p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto space-y-6">
+      <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-5 mb-6 gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Hasil Simulasi TOEFL Reading</span>
+            <h2 class="text-2xl font-bold text-slate-900 mt-1">Laporan Evaluasi & Pembahasan</h2>
+            <p id="timeSpentText" class="text-xs text-slate-500 mt-1"></p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="enterReviewMode(0)" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition">
+              Buka Tampilan Teks & Pembahasan
+            </button>
+            <button onclick="resetExam()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-lg text-sm font-semibold transition">
+              Ulangi Tes
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+            <div class="text-xs font-semibold text-blue-700 uppercase">Estimasi Skor Section 3</div>
+            <div id="scaledScoreDisplay" class="text-3xl font-extrabold text-blue-900 mt-1">31</div>
+            <div class="text-[11px] text-blue-600 mt-0.5">Skala TOEFL ITP (31–67)</div>
+          </div>
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+            <div class="text-xs font-semibold text-emerald-700 uppercase">Jawaban Benar</div>
+            <div id="correctCountDisplay" class="text-3xl font-extrabold text-emerald-900 mt-1">0</div>
+            <div class="text-[11px] text-emerald-600 mt-0.5">dari 50 soal</div>
+          </div>
+          <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 text-center">
+            <div class="text-xs font-semibold text-rose-700 uppercase">Jawaban Salah</div>
+            <div id="wrongCountDisplay" class="text-3xl font-extrabold text-rose-900 mt-1">0</div>
+            <div class="text-[11px] text-rose-600 mt-0.5">soal</div>
+          </div>
+          <div class="bg-slate-100 border border-slate-200 rounded-xl p-4 text-center">
+            <div class="text-xs font-semibold text-slate-600 uppercase">Akurasi</div>
+            <div id="accuracyDisplay" class="text-3xl font-extrabold text-slate-900 mt-1">0%</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Persentase benar</div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold text-slate-800 mb-3">Performa per Teks Bacaan (Passage)</h3>
+          <div id="passageBreakdown" class="grid sm:grid-cols-5 gap-2.5 text-xs"></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 class="text-lg font-bold text-slate-900">Kunci Jawaban Resmi & Pembahasan Lengkap</h3>
+          <div class="flex gap-1.5 text-xs">
+            <button onclick="filterReview('all')" class="filter-btn bg-slate-800 text-white px-3 py-1.5 rounded font-medium">Semua (50)</button>
+            <button onclick="filterReview('wrong')" class="filter-btn bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded font-medium">Salah / Kosong</button>
+            <button onclick="filterReview('correct')" class="filter-btn bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded font-medium">Benar</button>
+          </div>
+        </div>
+        <div id="reviewListContainer" class="space-y-3"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const PASSAGES = [
+      {
+        id: 1,
+        range: "Questions 1–10",
+        title: "Global Warming",
+        source: "earthobservatory.nasa.gov",
+        lines: [
+          { n: "", text: "Throughout its long history, Earth has warmed and cooled time and again. Climate has changed when the planet received more or less sunlight due to subtle shifts in its orbit, as the atmosphere or surface changed, or when the Sun's energy varied. But in the past century, another force has started to influence Earth's climate: humanity.", newPara: true },
+          { n: "5", text: "" },
+          { n: "", text: "Global warming is the unusually rapid increase in Earth's average surface temperature over the past century primarily due to the greenhouse gases released as people burn fossil fuels. The global average surface temperature rose 0.6 to 0.9 degrees Celsius (1.1 to 1.6° F) between 1906 and 2005, and the rate of temperature increase has nearly doubled in the last 50 years. Temperatures are certain to go up further.", newPara: true },
+          { n: "10", text: "" },
+          { n: "", text: "Despite ups and downs from year to year, global average surface temperature is rising. By the beginning of the 21st century, Earth's temperature was roughly 0.5 degrees Celsius above the long-term (1951–1980) average.", newPara: true },
+          { n: "", text: "Earth's temperature begins with the Sun. Roughly 30 percent of incoming sunlight is reflected back into space by bright surfaces like clouds and ice. Of the remaining 70 percent, most is absorbed by the land and ocean, and the rest is absorbed by the atmosphere. The absorbed solar energy heats our planet.", newPara: true },
+          { n: "15", text: "" },
+          { n: "", text: "As the rocks, the air, and the seas warm, they radiate "heat" energy (thermal infrared radiation). From the surface, this energy travels into the atmosphere where much of it is absorbed by water vapor and long-lived greenhouse gases such as carbon dioxide and methane.", newPara: true },
+          { n: "20", text: "" },
+          { n: "", text: "When they absorb the energy radiating from Earth's surface, microscopic water or greenhouse gas molecules turn into tiny heaters—like the bricks in a fireplace, they radiate heat even after the fire goes out. They radiate in all directions. The energy that radiates back toward Earth heats both the lower atmosphere and the surface, enhancing the heating they get from direct sunlight.", newPara: true },
+          { n: "25", text: "" },
+          { n: "", text: "This absorption and radiation of heat by the atmosphere—the natural greenhouse effect—is beneficial for life on Earth. If there were no greenhouse effect, the Earth's average surface temperature would be a very chilly -18°C (0°F) instead of the comfortable 15°C (59°F) that it is today.", newPara: true },
+          { n: "30", text: "" },
+          { n: "", text: "What has scientists concerned now is that over the past 250 years, humans have been artificially raising the concentration of greenhouse gases in the atmosphere at an ever-increasing rate, mostly by burning fossil fuels, but also from cutting down carbon-absorbing forests. Since the Industrial Revolution began in about 1750, carbon dioxide levels have increased nearly 38 percent as of 2009 and methane levels have increased 148 percent.", newPara: true },
+          { n: "35", text: "" },
+          { n: "40", text: "Increases in concentrations of carbon dioxide (top) and methane (bottom) coincided with the start of the Industrial Revolution in about 1750. Measurements from Antarctic ice cores (green lines) combined with direct atmospheric measurements (blue lines) show the increase of both gases over time.", newPara: true },
+          { n: "45", text: "The atmosphere today contains more greenhouse gas molecules, so more of the infrared energy emitted by the surface ends up being absorbed by the atmosphere. Since some of the extra energy from a warmer atmosphere radiates back down to the surface, Earth's surface temperature rises. By increasing the concentration of greenhouse gases, we are making Earth's atmosphere a more efficient greenhouse.", newPara: true },
+          { n: "50", text: "" }
+        ],
+        numberedLines: [
+          { num: "line", text: "Throughout its long history, Earth has warmed and cooled time and" },
+          { num: "", text: "again. Climate has changed when the planet received more or less sunlight" },
+          { num: "", text: "due to subtle shifts in its orbit, as the atmosphere or surface changed, or" },
+          { num: "", text: "when the Sun's energy varied. But in the past century, another force has" },
+          { num: "5", text: "started to influence Earth's climate: humanity." },
+          { num: "", text: "Global warming is the unusually rapid increase in Earth's average surfa-", indent: true },
+          { num: "", text: "ce temperature over the past century primarily due to the greenhouse gases" },
+          { num: "", text: "released as people burn fossil fuels. The global average surface temperature" },
+          { num: "", text: "rose 0.6 to 0.9 degrees Celsius (1.1 to 1.6° F) between 1906 and 2005, and" },
+          { num: "10", text: "the rate of temperature increase has nearly doubled in the last 50 years." },
+          { num: "", text: "Temperatures are certain to go up further." },
+          { num: "", text: "Despite ups and downs from year to year, global average surface tem-", indent: true },
+          { num: "", text: "perature is rising. By the beginning of the 21st century, Earth's temperature" },
+          { num: "", text: "was roughly 0.5 degrees Celsius above the long-term (1951–1980) average." },
+          { num: "15", text: "Earth's temperature begins with the Sun. Roughly 30 percent of inco-", indent: true },
+          { num: "", text: "ming sunlight is reflected back into space by bright surfaces like clouds and" },
+          { num: "", text: "ice. Of the remaining 70 percent, most is absorbed by the land and ocean," },
+          { num: "", text: "and the rest is absorbed by the atmosphere. The absorbed solar energy" },
+          { num: "", text: "heats our planet." },
+          { num: "20", text: "As the rocks, the air, and the seas warm, they radiate "heat" energy", indent: true },
+          { num: "", text: "(thermal infrared radiation). From the surface, this energy travels into the" },
+          { num: "", text: "atmosphere where much of it is absorbed by water vapor and long-lived" },
+          { num: "", text: "greenhouse gases such as carbon dioxide and methane." },
+          { num: "", text: "When they absorb the energy radiating from Earth's surface, micros-", indent: true },
+          { num: "25", text: "copic water or greenhouse gas molecules turn into tiny heaters—like the" },
+          { num: "", text: "bricks in a fireplace, they radiate heat even after the fire goes out. They ra-" },
+          { num: "", text: "diate in all directions. The energy that radiates back toward Earth heats both" },
+          { num: "", text: "the lower atmosphere and the surface, enhancing the heating they get from" },
+          { num: "", text: "direct sunlight." },
+          { num: "30", text: "This absorption and radiation of heat by the atmosphere—the natural", indent: true },
+          { num: "", text: "greenhouse effect—is beneficial for life on Earth. If there were no greenho-" },
+          { num: "", text: "use effect, the Earth's average surface temperature would be a very chilly" },
+          { num: "", text: "-18°C (0°F) instead of the comfortable 15°C (59°F) that it is today." },
+          { num: "", text: "What has scientists concerned now is that over the past 250 years, hu-", indent: true },
+          { num: "35", text: "mans have been artificially raising the concentration of greenhouse gases" },
+          { num: "", text: "in the atmosphere at an ever-increasing rate, mostly by burning fossil fuels," },
+          { num: "", text: "but also from cutting down carbon-absorbing forests. Since the Industrial" },
+          { num: "", text: "Revolution began in about 1750, carbon dioxide levels have increased nearly" },
+          { num: "", text: "38 percent as of 2009 and methane levels have increased 148 percent." },
+          { num: "40", text: "Increases in concentrations of carbon dioxide (top) and methane (bot-", indent: true },
+          { num: "", text: "tom) coincided with the start of the Industrial Revolution in about 1750." },
+          { num: "", text: "Measurements from Antarctic ice cores (green lines) combined with direct" },
+          { num: "", text: "atmospheric measurements (blue lines) show the increase of both gases" },
+          { num: "", text: "over time." },
+          { num: "45", text: "The atmosphere today contains more greenhouse gas molecules, so", indent: true },
+          { num: "", text: "more of the infrared energy emitted by the surface ends up being absorbed" },
+          { num: "", text: "by the atmosphere. Since some of the extra energy from a warmer atmosp-" },
+          { num: "", text: "here radiates back down to the surface, Earth's surface temperature rises." },
+          { num: "", text: "By increasing the concentration of greenhouse gases, we are making Earth's" },
+          { num: "50", text: "atmosphere a more efficient greenhouse." }
+        ]
+      },
+      {
+        id: 2,
+        range: "Questions 11–20",
+        title: "HIV Heterosexual Transmission & STDs",
+        source: "www.ncbi.nlm.nih.gov/pmc",
+        numberedLines: [
+          { num: "line", text: "Although AIDS was first defined in homosexual men in the United States", indent: true },
+          { num: "", text: "and male-to-male sex remains the predominant mode of transmission in" },
+          { num: "", text: "most industrialized countries, the predominant mode of transmission wor-" },
+          { num: "", text: "ldwide continues to be heterosexual contact (75% of total spread). As epi-" },
+          { num: "5", text: "demics of HIV infections fueled largely by heterosexual transmission have" },
+          { num: "", text: "developed in resource-poor countries, the age at which transmission occurs" },
+          { num: "", text: "has fallen: half of all transmissions are now believed to occur among people" },
+          { num: "", text: "under the age of 25. As heterosexual transmission increases, the impact of" },
+          { num: "", text: "the pandemic on women is rising, even in countries where other routes of" },
+          { num: "10", text: "transmission are more prevalent." },
+          { num: "", text: "Several risk factors have been associated with the heterosexual trans-", indent: true },
+          { num: "", text: "mission of HIV, including lack of circumcision, high virus load and decreased" },
+          { num: "", text: "CD4+ cell count in an infected partner, presence of an STD (genital ulcer dise-" },
+          { num: "", text: "ase or nonulcerative STDs), and certain sexual practices. According to several" },
+          { num: "15", text: "studies, uncircumcised men were eight times more likely to be HIV infected" },
+          { num: "", text: "than were those who were circumcised, and men with foreskins were more" },
+          { num: "", text: "likely to transmit HIV to their sex partners during unprotected sex." },
+          { num: "", text: "Strong epidemiologic, clinical, and laboratory data demonstrate the in-", indent: true },
+          { num: "", text: "creased risk for HIV transmission and acquisition due to other STDs. The pre-" },
+          { num: "20", text: "sence of ulcerative and inflammatory nonulcerative STDs may promote the" },
+          { num: "", text: "infectiousness of HIV and susceptibility to it by (i) disrupting normal mucosal" },
+          { num: "", text: "barriers, which allows HIV into the bloodstream; (ii) facilitating HIV shedding" },
+          { num: "", text: "in the genital tract; and (iii) recruiting HIV inflammatory cells to the genital" },
+          { num: "", text: "tract. The presence of genital ulcers, syphilis, genital herpes, or chancroid in" },
+          { num: "25", text: "men and women is associated with a 1.5- to 7-fold-increased risk for HIV" },
+          { num: "", text: "infection." },
+          { num: "", text: "Two intervention trials examined the effect of treating STDs to reduce", indent: true },
+          { num: "", text: "the spread of HIV infection. In a study in Mwanza, Tanzania, the treatment of" },
+          { num: "", text: "symptomatic STDs reduced HIV incidence by 40%. In a study of adults in the" },
+          { num: "30", text: "Rakai district in Uganda to assess the effect of the mass distribution of STD" },
+          { num: "", text: "medications (to persons with and without symptoms) on HIV incidence, the" },
+          { num: "", text: "treatment did reduce the prevalence of some STDs, but it did not decrease" },
+          { num: "", text: "HIV incidence. Although the different effects of these two regimens is not" },
+          { num: "", text: "totally understood, the difference in the relative durations of the epidemics" },
+          { num: "35", text: "(longer term in Uganda) and the different intervention methods most likely" },
+          { num: "", text: "contributed to the different results. The Rakai results do tell us that preven-" },
+          { num: "", text: "tion and control of STDs are effective, affordable, and feasible in resource-" },
+          { num: "", text: "poor settings. The Mwanza study clearly showed that integrating STD care" },
+          { num: "", text: "into primary health care services can lead to a considerable reduction in HIV" },
+          { num: "40", text: "transmission." },
+          { num: "", text: "In many parts of the developing world, STDs are prevalent but treatment", indent: true },
+          { num: "", text: "and services are inadequate. The reduction in STDs can prevent HIV trans-" },
+          { num: "", text: "mission in populations at high or medium risk, and accessible and effecti-" },
+          { num: "", text: "ve STD treatment services can lower the incidence of HIV infection. Studies" },
+          { num: "45", text: "around the world confirm that improving the management of STD care is an" },
+          { num: "", text: "important HIV prevention strategy." }
+        ]
+      },
+      {
+        id: 3,
+        range: "Questions 21–30",
+        title: "The Life of William Shakespeare",
+        source: "www.biography.com",
+        numberedLines: [
+          { num: "line", text: "Though no birth records exist, church records indicate that a William", indent: true },
+          { num: "", text: "Shakespeare was baptized at Holy Trinity Church in Stratford-upon-Avon on" },
+          { num: "", text: "April 26, 1564. From this, it is believed he was born on or near April 23, 1564," },
+          { num: "", text: "and this is the date scholars acknowledge as William Shakespeare's birthday." },
+          { num: "5", text: "Located 103 miles west of London, during Shakespeare's time Stratford-", indent: true },
+          { num: "", text: "upon-Avon was a market town bisected with a country road and the River" },
+          { num: "", text: "Avon. William was the third child of John Shakespeare, a leather merchant," },
+          { num: "", text: "and Mary Arden, a local landed heiress. William had two older sisters, Joan" },
+          { num: "", text: "and Judith, and three younger brothers, Gilbert, Richard and Edmund. Befo-" },
+          { num: "10", text: "re William's birth, his father became a successful merchant and held official" },
+          { num: "", text: "positions as alderman and bailiff, an office resembling a mayor. However," },
+          { num: "", text: "records indicate John's fortunes declined sometime in the late 1570s." },
+          { num: "", text: "William Shakespeare married Anne Hathaway on November 28, 1582, in", indent: true },
+          { num: "", text: "Worcester, in Canterbury Province. Hathaway was from Shottery, a small vil-" },
+          { num: "15", text: "lage a mile west of Stratford. William was 18 and Anne was 26, and, as it turns" },
+          { num: "", text: "out, pregnant. Their first child, a daughter they named Susanna, was born on" },
+          { num: "", text: "May 26, 1583. Two years later, on February 2, 1585, twins Hamnet and Judith" },
+          { num: "", text: "were born. Hamnet later died of unknown causes at age 11." },
+          { num: "", text: "By 1592, there is evidence William Shakespeare earned a living as an", indent: true },
+          { num: "20", text: "actor and a playwright and possibly had several plays produced." },
+          { num: "", text: "By 1597, 15 of the 37 plays written by William Shakespeare were published." },
+          { num: "", text: "Civil records show that at this time he purchased the second largest house" },
+          { num: "", text: "in Stratford, called New House, for his family. It was a four-day ride by horse" },
+          { num: "", text: "from Stratford to London, so it is believed that Shakespeare spent most of" },
+          { num: "25", text: "his time in the city writing and acting and came home once a year during the" },
+          { num: "", text: "40-day Lenten period, when the theaters were closed." },
+          { num: "", text: "By 1599, William Shakespeare and his business partners built their own", indent: true },
+          { num: "", text: "theater on the south bank of the Thames River, which they called the Globe." },
+          { num: "", text: "In 1605, Shakespeare purchased leases of real estate near Stratford for 440" },
+          { num: "30", text: "pounds, which doubled in value and earned him 60 pounds a year. This made" },
+          { num: "", text: "him an entrepreneur as well as an artist, and scholars believe these invest-" },
+          { num: "", text: "ments gave him the time to write his plays uninterrupted." },
+          { num: "", text: "Tradition has it that William Shakespeare died on his birthday, April 23,", indent: true },
+          { num: "", text: "1616, though many scholars believe this is a myth. Church records show he" },
+          { num: "35", text: "was interred at Trinity Church on April 25, 1616. In his will, he left the bulk of" },
+          { num: "", text: "his possessions to his eldest daughter, Susanna. Though entitled to a third of" },
+          { num: "", text: "his estate, little seems to have gone to his wife, Anne, whom he bequeathed" },
+          { num: "", text: "his "second-best bed."" }
+        ]
+      },
+      {
+        id: 4,
+        range: "Questions 31–40",
+        title: "Australian Aboriginal Art",
+        source: "www.aboriginalculture.com.au",
+        numberedLines: [
+          { num: "line", text: "Religious and ceremonial aspects of life, being so important, are the", indent: true },
+          { num: "", text: "inspiration for much art. Aboriginal art and decoration is an integral part of" },
+          { num: "", text: "traditional life, and occurs as body decoration in ceremonies, on bark shelter" },
+          { num: "", text: "and rock shelter walls, on trees (dendroglyphs), carved on rocks (petroglyp-" },
+          { num: "5", text: "hs), weapons, utensils, and sacred objected both natural and carved." },
+          { num: "", text: "Much of the painted and carved art can be divided simply into two", indent: true },
+          { num: "", text: "broad categories or styles – naturalistic or figurative and non-naturalistic or" },
+          { num: "", text: "non-figurative. However, Aboriginal art is much more complex than this and" },
+          { num: "", text: "includes stencils, thread-cross strings on poles, free standing carvings and" },
+          { num: "10", text: "objects including beeswax models, charcoal drawings, drawings and raised" },
+          { num: "", text: "designs in sand, the application of feathers and feather down, and so on." },
+          { num: "", text: "A naturalistic style or figurative style means that any person looking at", indent: true },
+          { num: "", text: "the art is able to recognise what basic subject is being depicted. It looks ba-" },
+          { num: "", text: "sically natural or is a figure of the intended subject. Of course, a macropod" },
+          { num: "15", text: "figure might represent a large kangaroo or a small wallaby, but the basic" },
+          { num: "", text: "figure is recognisable. Within the grouping of "naturalistic figures" comes" },
+          { num: "", text: "many further subdivisions, based on the subtle differences of the countless" },
+          { num: "", text: "styles an artist might use. Both researchers and Aborigines might then name" },
+          { num: "", text: "those further subdivisions for their particular locality, based on a dominant" },
+          { num: "20", text: "feature of that particular art style." },
+          { num: "", text: "Some of the most beautiful Australian Aboriginal art using a naturalistic", indent: true },
+          { num: "", text: "art style is found in the rock art across northern Australia, the best-known" },
+          { num: "", text: "regions being the Kimberley and Kakadu regions. One form of this style is" },
+          { num: "", text: "where the internal anatomy of an animal is also shown in the painting, and" },
+          { num: "25", text: "hence this is called "X-ray" art." },
+          { num: "", text: "Non-naturalistic or non-figurative styles include abstract styles and ge-", indent: true },
+          { num: "", text: "ometric patterns, the most common being those seen in the art of Central" },
+          { num: "", text: "Australia. Here, for example, the arc shape might represent a man or woman" },
+          { num: "", text: "sitting at their campfire, or it may represent a boomerang. A circle might" },
+          { num: "30", text: "represent any important person or place, or even represent the story of im-" },
+          { num: "", text: "portant event that took place." },
+          { num: "", text: "Now that the collecting of pieces of Aboriginal art has become so po-", indent: true },
+          { num: "", text: "pular world-wide, a common, mistaken belief is that the Dot Painting Style of" },
+          { num: "", text: "Central Australia is a recent development. This belief arises because it was in" },
+          { num: "35", text: "the 1960s that a Central Australian school teacher encouraged the old men" },
+          { num: "", text: "of the tribe to record their art on European sheets of board, using acrylic" },
+          { num: "", text: "paints. This use of acrylic paints on flat board dates from that time. However," },
+          { num: "", text: "the art style itself, with geometric designs, is seen in the petroglyphs (rock" },
+          { num: "", text: "engravings) dating back thousands of years." },
+          { num: "40", text: "The use of dots was once Australia-wide, particularly seen on body de-", indent: true },
+          { num: "", text: "coration when people are painted for ceremonies, and I have located pain-" },
+          { num: "", text: "tings in the remote Kimberley region where dots are clearly seen on the" },
+          { num: "", text: "body decoration of some of the earliest human figures, likely to be older" },
+          { num: "", text: "than 20,000 years." }
+        ]
+      },
+      {
+        id: 5,
+        range: "Questions 41–50",
+        title: "The Thermosphere",
+        source: "www.windows2universe.org",
+        numberedLines: [
+          { num: "line", text: "The thermosphere is a layer of Earth's atmosphere. The thermosphere", indent: true },
+          { num: "", text: "is directly above the mesosphere and below the exosphere. It extends from" },
+          { num: "", text: "about 90 km to between 500 and 1,000 km above our planet." },
+          { num: "", text: "Temperatures climb sharply in the lower thermosphere (below 200 to", indent: true },
+          { num: "5", text: "300 km altitude), then level off and hold fairly steady with increasing altitude" },
+          { num: "", text: "above that height. Solar activity strongly influences temperature in the ther-" },
+          { num: "", text: "mosphere. The thermosphere is typically about 200° C hotter in the daytime" },
+          { num: "", text: "than at night, and roughly 500° C hotter when the Sun is very active than at" },
+          { num: "", text: "other times. Temperatures in the upper thermosphere can range from about" },
+          { num: "10", text: "500° C to 2,000° C or higher." },
+          { num: "", text: "The boundary between the thermosphere and the exosphere above it is", indent: true },
+          { num: "", text: "called the thermopause. At the bottom of the thermosphere is the mesopau-" },
+          { num: "", text: "se, the boundary between the thermosphere and the mesosphere below." },
+          { num: "", text: "Below the thermosphere, gases made of different types of atoms and", indent: true },
+          { num: "15", text: "molecules are thoroughly mixed together by turbulence in the atmosphere." },
+          { num: "", text: "Air in the lower atmosphere is mainly composed of the familiar blend of abo-" },
+          { num: "", text: "ut 80% nitrogen molecules (N₂) and about 20% oxygen molecules (O₂). In the" },
+          { num: "", text: "thermosphere and above, gas particles collide so infrequently that the ga-" },
+          { num: "", text: "ses become somewhat separated based on the types of chemical elements" },
+          { num: "20", text: "they contain. Energetic ultraviolet and X-rayphotons from the Sun also break" },
+          { num: "", text: "apart molecules in the thermosphere. In the upper thermosphere, atomic" },
+          { num: "", text: "oxygen (O), atomic nitrogen (N), and helium (He) are the main components" },
+          { num: "", text: "of air." },
+          { num: "", text: "Much of the X-ray and UV radiation from the Sun is absorbed in the", indent: true },
+          { num: "25", text: "thermosphere. When the Sun is very active and emitting more high energy" },
+          { num: "", text: "radiation, the thermosphere gets hotter and expands or "puffs up". Because" },
+          { num: "", text: "of this, the height of the top of the thermosphere (the thermopause) varies." },
+          { num: "", text: "The thermopause is found at an altitude between 500 km and 1,000 km or" },
+          { num: "", text: "higher. Since many satellites orbit within the thermosphere, changes in the" },
+          { num: "30", text: "density of (the very, very thin) air at orbital altitudes brought on by hea-" },
+          { num: "", text: "ting and expansion of the thermosphere generates a drag force on satellites." },
+          { num: "", text: "Engineers must take this varying drag into account when calculating orbits," },
+          { num: "", text: "and satellites occasionally need to be boosted higher to offset the effects of" },
+          { num: "", text: "the drag force." },
+          { num: "35", text: "Finally, the aurora primarily occur in the thermosphere. Charged partic-", indent: true },
+          { num: "", text: "les (electrons, protons, and other ions) from space collide with atoms and" },
+          { num: "", text: "molecules in the thermosphere at high latitudes, exciting them into higher" },
+          { num: "", text: "energy states. Those atoms and molecules shed this excess energy by emit-" },
+          { num: "", text: "ting photons of light, which we see as colorful auroral displays." }
+        ]
+      }
+    ];
+
+    const QUESTIONS = [
+      // PASSAGE 1 (1-10)
+      {
+        q: "What does the passage mainly discuss?",
+        options: ["Chemical gases on the Earth", "Global warming", "Human's doings cause global warming", "The increasing number of factories"],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Teks ini secara keseluruhan membahas mengenai pemanasan global (Global warming), mekanisme efek rumah kaca, dan faktor peningkatannya."
+      },
+      {
+        q: "What is the purpose of the second paragraph?",
+        options: ["To persuade the readers to prevent the global warming", "To explains deeply about chemical gases cause the global warming", "To introduce the readers about what global warming is", "To entertain the readers about certain pehenomenon"],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Paragraf kedua mendefinisikan dan memperkenalkan kepada pembaca apa itu pemanasan global ('Global warming is the unusually rapid increase in Earth's average surface temperature...')."
+      },
+      {
+        q: "The word "rapid" in line 6 is closest in meaning to ....",
+        options: ["Slow", "Rare", "Extinct", "Fast"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). 'Rapid' berarti cepat, sehingga bersinonim dengan 'Fast'."
+      },
+      {
+        q: "What does the eighth paragraph talk about?",
+        options: ["Human has a great influence in raising the greenhouse gases.", "The temperature of Earth has been raising during fifty years.", "Global warming's bad effects toward human beings and plants.", "More of the infrared energy emitted by the surface ends up being absorbed by the atmosphere."],
+        correct: 0, // A (Sesuai Kunci Resmi Hal. 195)
+        explanation: "Kunci Resmi: (A). Paragraf kedelapan (baris 34–39) membahas peran besar aktivitas manusia dalam meningkatkan konsentrasi gas rumah kaca selama 250 tahun terakhir."
+      },
+      {
+        q: "In which paragraph does the author mention that the rate of temperature increase has nearly doubled in the last fifty years?",
+        options: ["1", "2", "3", "4"],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Informasi tersebut disebutkan secara eksplisit pada paragraf 2 (baris 9–10): '...and the rate of temperature increase has nearly doubled in the last 50 years.'"
+      },
+      {
+        q: "The following information are true based on the paragraph eight and nine, EXCEPT ..",
+        options: ["The greenhouse gases's concentration is only caused by the burning fossil fuels.", "Methane levels have increased 148 percent.", "The increase of concentration of carbon dioxide and methane was started from the Industrial Revolution.", "Since the Industrial Revolution began in about 1750, carbon dioxide levels have increased nearly 38 percent."],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). Pernyataan (A) salah karena di baris 36–37 disebutkan bahwa peningkatan gas rumah kaca disebabkan oleh pembakaran bahan bakar fosil DAN penebangan hutan penyerap karbon ('mostly by burning fossil fuels, but also from cutting down carbon-absorbing forests')."
+      },
+      {
+        q: "When was the temperature roughly 0.5 degrees Celcius above the long ter (1951-1980) average?",
+        options: ["At the end of 19th century", "At the beginning of 21st century", "At the middle of 21st century", "At the middle of 20th century"],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Pada paragraf 3 (baris 13–14): 'By the beginning of the 21st century, Earth's temperature was roughly 0.5 degrees Celsius above the long-term (1951–1980) average.'"
+      },
+      {
+        q: "The word "primarily" in line 7 is closest in meaning to ......",
+        options: ["Mainly", "Quickly", "Rapidly", "Accidentally"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). 'Primarily' berarti terutama/utamanya, yang paling dekat maknanya dengan 'Mainly'."
+      },
+      {
+        q: "When did the global average surface temperature rise from 1.1 to 1.6° F?",
+        options: ["In 1750", "During 2005", "At the end of 19th century", "Between 1906 and 2005"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Pada baris 8–9 tertulis jelas: 'The global average surface temperature rose 0.6 to 0.9 degrees Celsius (1.1 to 1.6° F) between 1906 and 2005'."
+      },
+      {
+        q: "In what line does the author mention that the atmosphere today contains more greenhouse gas molecules?",
+        options: ["40", "45", "39", "20"],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Kalimat 'The atmosphere today contains more greenhouse gas molecules...' tepat berada di awal paragraf terakhir pada baris ke-45."
+      },
+
+      // PASSAGE 2 (11-20)
+      {
+        q: "What does the passage talk about?",
+        options: ["The number of HIV AIDS sufferers in the world", "The spread of HIV AIDS due to sexual transmission", "Some researches of HIV AIDS cases", "The symptoms of HIV AIDS in developing countries"],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Bacaan ini membahas penyebaran HIV/AIDS melalui transmisi seksual (khususnya heteroseksual), faktor risikonya, serta pengaruh penanganan penyakit menular seksual (STD)."
+      },
+      {
+        q: "The following are risk factors that have been associated with the heterosexual transmission of HIV, EXCEPT ......",
+        options: ["Low virus load and decreased CD4+ cell count in an infected partner", "Certain sexual practices", "Presence of an STD", "Lack of circumcision"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). Pada baris 12 disebutkan 'high virus load' (muatan virus tinggi), bukan 'low virus load' (muatan virus rendah)."
+      },
+      {
+        q: "The word their in line 16 refer to ......",
+        options: ["Men with low virus load and decreased CD4+", "HIV virus", "Women with HIV virus", "Men with foreskins"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Pada baris 16–17: '...and men with foreskins were more likely to transmit HIV to their sex partners...', sehingga 'their' merujuk pada 'men with foreskins'."
+      },
+      {
+        q: "What does the first paragraph talk about?",
+        options: ["The causes of HIV spread", "The presence of ulcerative and inflammatory nonulcerative STDs", "The predominant mode of transmission worldwide is heterosexual contact", "Two intervention trials examined the effect of treating STDs"],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Paragraf pertama menjelaskan bahwa cara penularan HIV yang paling dominan di seluruh dunia adalah melalui kontak heteroseksual (75% dari total penyebaran)."
+      },
+      {
+        q: "The word to assess in line 28 is closest in meaning to .........",
+        options: ["To judge", "To give", "To carry out", "To postpone"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). 'To assess' (menilai/mengevaluasi) memiliki makna terdekat dengan 'To judge'."
+      },
+      {
+        q: "In what line does the author mention that some studies confirmed that improving the management of STD care is important strategy to prevent HIV?",
+        options: ["32 – 34", "11 – 14", "16 – 17", "41 – 43"],
+        correct: 3, // D (Sesuai Kunci Resmi Hal. 195)
+        explanation: "Kunci Resmi: (D). Informasi mengenai penanganan dan layanan STD untuk mencegah penularan HIV berada di paragraf terakhir (mulai baris 41–46)."
+      },
+      {
+        q: "In what paragraph does the author state about the two trials examined the effect of treating STD to reduce the HIV infection's spread?",
+        options: ["1", "2", "3", "4"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Kalimat 'Two intervention trials examined the effect of treating STDs to reduce the spread of HIV infection' merupakan kalimat pembuka paragraf ke-4 (baris 27)."
+      },
+      {
+        q: "The word prevalent in line 9 is closest in meaning to ....",
+        options: ["Very common", "Very dangerous", "Very rare", "Very advantageous"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). 'Prevalent' berarti umum terjadi atau meluas, sehingga bersinonim dengan 'Very common'."
+      },
+      {
+        q: "The presence of ulcerative and inflammatory nonulcerative STDs may promote the infectiousness of HIV and susceptibility to it by ......",
+        options: ["Facilitating HIV shedding in the genital tract", "Disrupting high mucosal barriers", "Eliminating HIV inflammatory cells to the genital tract", "Blocking HIV shedding in the genital tract"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). Pada baris 22 disebutkan poin kedua: '(ii) facilitating HIV shedding in the genital tract'."
+      },
+      {
+        q: "In what line does the author mention that the predominant mode of transmission worldwide comes from heterosexual contact?",
+        options: ["3 – 4", "5 – 6", "7 – 8", "9 – 10"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). Pernyataan '...the predominant mode of transmission worldwide continues to be heterosexual contact' terletak pada baris ke-3 dan ke-4."
+      },
+
+      // PASSAGE 3 (21-30)
+      {
+        q: "What is the passage talk about?",
+        options: ["Some literary works written by William Shakespeare", "The life story of William Shakespeare", "William Shakespeare is not only an actor and writer, but also an entrepreneur", "None knows about the real time when he had passed away."],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Bacaan ini menguraikan kisah hidup William Shakespeare secara kronologis dari kelahiran, keluarga, pernikahan, karier, hingga kematiannya."
+      },
+      {
+        q: "What does the first paragraph suppose to mean?",
+        options: ["The birthday of William Shkespeare was April 23, 1564", "The scholars did not acknowledge the birthday of William Shakespeare.", "The scholars is still seeking the real birthday of William Shakespeare.", "None knew the exact time when William Shakespeare was born."],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Kalimat pembuka menyebutkan 'Though no birth records exist...' yang berarti tidak ada yang mengetahui secara pasti tanggal lahirnya."
+      },
+      {
+        q: "Why was William Shakespeare's daughter died at the age of 11?",
+        options: ["Acute sickness", "Contagion", "Unknown causes", "Accident"],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Pada baris 18 tertulis: 'Hamnet later died of unknown causes at age 11' (meski di teks Hamnet adalah putra kembarnya, soal merujuk pada penyebab kematiannya yaitu 'Unknown causes')."
+      },
+      {
+        q: "In what year was his 15 plays being published?",
+        options: ["1582", "1592", "1599", "1597"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Pada baris 21 tertulis: 'By 1597, 15 of the 37 plays written by William Shakespeare were published.'"
+      },
+      {
+        q: "In what paragraph did the author mention that William Shakespeare was not only an actor, but also an entrepreneur?",
+        options: ["3", "4", "5", "6"],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Informasi '...This made him an entrepreneur as well as an artist...' terletak di paragraf ke-5 (baris 30–31)."
+      },
+      {
+        q: "What was shown by Civil records?",
+        options: ["He purchased the second largest house in Stratford", "There were 3 plays that he wrote", "William Shakespeare died on his birthday, April 23, 1616", "William Shakespeare married Anne Hathaway on November 28, 1582"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). Pada baris 22 tertulis: 'Civil records show that at this time he purchased the second largest house in Stratford, called New House, for his family.'"
+      },
+      {
+        q: "In what line did the author mention that William Shakespeare and his partner built their own theater?",
+        options: ["28 – 29", "16 – 17", "27 – 28", "32 – 33"],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Pada baris 27–28 tertulis: 'By 1599, William Shakespeare and his business partners built their own theater on the south bank of the Thames River...'"
+      },
+      {
+        q: "The word acknowledge in line 4 is closest in meaning to ....",
+        options: ["Refuse", "Understand", "Guess", "Admit"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). 'Acknowledge' berarti mengakui atau menerima kebenaran sesuatu, bersinonim dengan 'Admit'."
+      },
+      {
+        q: "What did the third paragraph talk about?",
+        options: ["The story of William Shakespeare's wife", "The story of William Shakespeare's marriage life", "The writing process of Shakespeare's works", "The death of William Shakespeare."],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Paragraf ketiga (baris 13–18) menceritakan pernikahan William Shakespeare dengan Anne Hathaway serta kelahiran anak-anak mereka."
+      },
+      {
+        q: "The following information are mentioned in the last paragraph, EXCEPT...",
+        options: ["Shakespeare left his fortune mostly to his daughter.", "Shakespeare's oldest daughter is Susanna.", "Church records show he was interred at Trinity Church on April 25, 1616", "All scholars believed that Shakespeare died in April 23, 1616."],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Pernyataan (D) bertentangan dengan isi bacaan (baris 34) yang menyatakan 'though many scholars believe this is a myth'."
+      },
+
+      // PASSAGE 4 (31-40)
+      {
+        q: "What does the passage talk about?",
+        options: ["Naturalistic style of art", "Religious and ceremonial aspects of life", "The use of dots in Australian arts", "Aboriginal art"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Secara keseluruhan bacaan ini membahas seni suku Aborigin Australia (Aboriginal art), gaya-gayanya, serta sejarah seni lukis titik (Dot Painting)."
+      },
+      {
+        q: "The word integral in line 2 is closest in meaning to ......",
+        options: ["Important", "Advantageous", "Lack", "Regional"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). 'Integral' bermakna penting/tidak terpisahkan, sehingga paling dekat dengan 'Important'."
+      },
+      {
+        q: "What became the inspiration of much art?",
+        options: ["Nature", "The head of tribe", "Religious and ceremonial aspects of life", "Rocks, plants, and animals"],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Kalimat pertama bacaan berbunyi: 'Religious and ceremonial aspects of life, being so important, are the inspiration for much art.'"
+      },
+      {
+        q: "What kinds of styles included in the non-figurative?",
+        options: ["Geometric patterns and kangaroo patterns", "Abstract styles and geometric patterns", "A pattern of a large kangaroo or a small wallaby", "Weapons, utensils, and sacred objects"],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Pada baris 26–27 tertulis: 'Non-naturalistic or non-figurative styles include abstract styles and geometric patterns...'"
+      },
+      {
+        q: "Why did the mistaken belief that the Dot Painting Style of Central Australia is a recent development appear?",
+        options: ["The use of dots was once Australia-wide, particularly seen on body decoration when people are painted for ceremonies.", "Aboriginal art is much more complex than this and includes stencils, thread-cross strings on poles, free standing carvings and objects", "Some of the most beautiful Australian Aboriginal art using a naturalistic art style is found in the rock art across northern Australia", "It because in the 1960s that a Central Australian school teacher encouraged the old men of the tribe to record their art on European sheets of board, using acrylic paints."],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Dijelaskan secara langsung di baris 34–37: 'This belief arises because it was in the 1960s that a Central Australian school teacher encouraged the old men of the tribe to record their art on European sheets of board, using acrylic paints.'"
+      },
+      {
+        q: "In which lines does the author mention that Aboriginal art is much more complex than the two simple categories?",
+        options: ["21 – 26", "29 – 32", "36 – 38", "8 – 11"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Pada baris ke-8 tertulis: 'However, Aboriginal art is much more complex than this and includes stencils...' hingga baris ke-11."
+      },
+      {
+        q: "The word represent in line 28 is closest in meaning to .....",
+        options: ["Describe", "Change", "Subscribe", "Believe"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). 'Represent' dalam konteks simbol seni berarti menggambarkan atau melambangkan, bersinonim dengan 'Describe'."
+      },
+      {
+        q: "The following information are mentioned in paragraph three, EXCEPT ....",
+        options: ["There are many further subdivisions in the naturalistic style.", "The basic figure is recognisable in the naturalistic style.", "Geometric design is seen in the petroglyphs dating back thousands of years.", "The definition of naturalistic style."],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Informasi tentang desain geometris pada petroglif yang berusia ribuan tahun berada di paragraf keenam (baris 38–39), bukan di paragraf ketiga."
+      },
+      {
+        q: "Where were some of the most beautiful Australian Aboriginal art using a naturalistic art style found?",
+        options: ["Australian museum", "Central Australian school", "In the art of Central Australia", "In the rock art across northern Australia"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Pada baris 21–22 tertulis: 'Some of the most beautiful Australian Aboriginal art using a naturalistic art style is found in the rock art across northern Australia...'"
+      },
+      {
+        q: "In what line does the author mention that the collecting of pieces of Aboriginal art has become so popular world-wide?",
+        options: ["20 – 22", "30 – 32", "35 – 37", "30 – 40"],
+        correct: 1, // B (Sesuai Kunci Resmi Hal. 195)
+        explanation: "Kunci Resmi: (B). Informasi '...the collecting of pieces of Aboriginal art has become so popular world-wide' berada di awal paragraf ke-6 (sekitar baris 32)."
+      },
+
+      // PASSAGE 5 (41-50)
+      {
+        q: "What does strongly influence temperature in the thermosphere?",
+        options: ["Solar activity", "Particles", "Aurora", "Molecules"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). Pada baris 6 tertulis jelas: 'Solar activity strongly influences temperature in the thermosphere.'"
+      },
+      {
+        q: "The word excess in line 35 is closest in meaning to ......",
+        options: ["Extra", "Quite", "Lack", "Around"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). 'Excess' berarti berlebih atau tambahan, sehingga bersinonim dengan 'Extra'."
+      },
+      {
+        q: "What are the main components of air in the upper thermosphere?",
+        options: ["Carbondioxide, helium, Nitrogen", "Nitrogen and Oxygen", "Proton, electron, helium", "Oxygen, Helium, Nitrogen"],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Pada baris 21–22 tertulis: 'In the upper thermosphere, atomic oxygen (O), atomic nitrogen (N), and helium (He) are the main components of air.'"
+      },
+      {
+        q: "In what line does the author mention that much of the X-ray and UV radiation from the Sun is absorbed in the thermosphere?",
+        options: ["12", "22", "32", "35"],
+        correct: 1, // B (Sesuai Kunci Resmi Hal. 195)
+        explanation: "Kunci Resmi: (B). Dalam buku kunci jawaban resmi (halaman 195), jawaban untuk nomor 44 ditetapkan (B) 22 (di dalam teks kalimatnya ada di awal paragraf ke-5, baris 24)."
+      },
+      {
+        q: "What does the last paragraph talk about?",
+        options: ["Kinds of aurora", "The color of aurora", "The occurence of aurora", "The atoms in thermosphere"],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Paragraf terakhir (baris 35–39) menjelaskan proses terjadinya aurora di lapisan termosfer ('Finally, the aurora primarily occur in the thermosphere...')."
+      },
+      {
+        q: "The following information are stated in the fifth paragraph, EXCEPT....",
+        options: ["The thermosphere is getting hotter if the sun is very active", "X-ray from the sun is absorbed in the thermosphere", "The thermopause is found at an altitude between 5,000 km and 1,000 km or higher.", "There are many satelites orbit within the thermosphere."],
+        correct: 2, // C
+        explanation: "Kunci Resmi: (C). Di baris 28 tertulis ketinggian thermopause adalah antara 500 km dan 1.000 km ('between 500 km and 1,000 km'), bukan 5.000 km."
+      },
+      {
+        q: "The word fairly in line 5 is closest in meaning to .....",
+        options: ["Quite", "More", "Less", "Much"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). 'Fairly' (cukup/agak) dalam frasa 'fairly steady' memiliki arti terdekat dengan 'Quite'."
+      },
+      {
+        q: "What kind of molecule with highest precentage in the lower atmosphere?",
+        options: ["Oxygen", "Nitrogen", "Helium", "Calcium"],
+        correct: 1, // B
+        explanation: "Kunci Resmi: (B). Pada baris 16–17 disebutkan udara di atmosfer bawah terdiri dari sekitar 80% molekul nitrogen dan 20% molekul oksigen, sehingga yang tertinggi adalah Nitrogen."
+      },
+      {
+        q: "The word extend in line 2 is closest in meaning to .....",
+        options: ["Reach", "Run", "Emit", "Excess"],
+        correct: 0, // A
+        explanation: "Kunci Resmi: (A). 'Extend' dalam konteks rentang ketinggian lapisan atmosfer berarti mencapai/membentang hingga, bersinonim dengan 'Reach'."
+      },
+      {
+        q: "What the temperature range in the upper thermosphere?",
+        options: ["about 50° C to 2,000° C or higher.", "about 500° C to 20,000° C or higher.", "about 50° C to 20,000° C or higher.", "about 500° C to 2,000° C or higher."],
+        correct: 3, // D
+        explanation: "Kunci Resmi: (D). Pada baris 9–10 tertulis: 'Temperatures in the upper thermosphere can range from about 500° C to 2,000° C or higher.'"
+      }
+    ];
+
+    const TOEFL_READING_SCALE = [
+      31, 31, 31, 31, 31, 31, 31, 31, 32, 32,
+      33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+      43, 43, 44, 45, 46, 46, 47, 48, 48, 49,
+      50, 51, 52, 52, 53, 54, 54, 55, 56, 56,
+      57, 58, 59, 60, 61, 62, 63, 65, 66, 67, 67
+    ];
+
+    let currentIdx = 0;
+    let userAnswers = new Array(50).fill(null);
+    let flagged = new Array(50).fill(false);
+    let timerInterval = null;
+    let timeLeft = 55 * 60;
+    let totalDuration = 55 * 60;
+    let isUntimed = false;
+    let isPaused = false;
+    let isReviewMode = false;
+    let fontSize = 15;
+    let activePassageId = null;
+
+    function getPassageForQuestion(qIdx) {
+      if (qIdx < 10) return PASSAGES[0];
+      if (qIdx < 20) return PASSAGES[1];
+      if (qIdx < 30) return PASSAGES[2];
+      if (qIdx < 40) return PASSAGES[3];
+      return PASSAGES[4];
+    }
+
+    function startExam() {
+      const mode = document.querySelector('input[name="examMode"]:checked').value;
+      isUntimed = (mode === 'untimed');
+      isReviewMode = false;
+      currentIdx = 0;
+      userAnswers = new Array(50).fill(null);
+      flagged = new Array(50).fill(false);
+      timeLeft = 55 * 60;
+      activePassageId = null;
+
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('examScreen').classList.remove('hidden');
+      document.getElementById('examScreen').classList.add('flex');
+      document.getElementById('examControls').classList.remove('hidden');
+      document.getElementById('examControls').classList.add('flex');
+      document.getElementById('backToResultBtn').classList.add('hidden');
+      document.getElementById('finishBtn').classList.remove('hidden');
+
+      if (isUntimed) {
+        document.getElementById('timerDisplay').textContent = "∞";
+        document.getElementById('pauseBtn').classList.add('hidden');
+      } else {
+        document.getElementById('pauseBtn').classList.remove('hidden');
+        startTimer();
+      }
+
+      renderQuestion();
+      updateAnsweredCount();
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      updateTimerUI();
+      timerInterval = setInterval(() => {
+        if (!isPaused && !isReviewMode) {
+          timeLeft--;
+          updateTimerUI();
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Waktu ujian 55 menit telah habis! Jawaban Anda akan dikumpulkan otomatis.");
+            submitExam();
+          }
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      const mins = Math.floor(timeLeft / 60);
+      const secs = timeLeft % 60;
+      const display = document.getElementById('timerDisplay');
+      display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      if (timeLeft <= 300) {
+        display.classList.remove('text-amber-400');
+        display.classList.add('text-rose-400', 'animate-pulse');
+      } else {
+        display.classList.add('text-amber-400');
+        display.classList.remove('text-rose-400', 'animate-pulse');
+      }
+    }
+
+    function togglePause() {
+      isPaused = !isPaused;
+      const overlay = document.getElementById('pauseOverlay');
+      if (isPaused) {
+        overlay.classList.remove('hidden');
+      } else {
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function changeFontSize(delta) {
+      fontSize = Math.min(21, Math.max(12, fontSize + delta));
+      document.getElementById('passageContainer').style.fontSize = fontSize + 'px';
+    }
+
+    function renderPassage(passage) {
+      if (activePassageId === passage.id) return;
+      activePassageId = passage.id;
+
+      document.getElementById('passageBadge').textContent = `Passage ${passage.id} (${passage.range})`;
+      document.getElementById('passageTitle').textContent = passage.title;
+
+      const container = document.getElementById('passageContainer');
+      let html = `<div class="mb-3 pb-2 border-b border-slate-200 text-xs font-sans text-slate-500">
+        <strong>${passage.range}</strong> are based on the following passage.
+      </div>`;
+
+      html += `<div class="space-y-1">`;
+      passage.numberedLines.forEach(line => {
+        const lineNum = line.num ? line.num : '&nbsp;';
+        const indentClass = line.indent ? 'pl-6' : '';
+        html += `
+          <div class="flex items-baseline gap-3 hover:bg-amber-50/60 rounded px-1">
+            <span class="w-7 text-right font-sans text-xs text-slate-400 shrink-0 select-none">${lineNum}</span>
+            <span class="${indentClass} text-slate-800">${line.text}</span>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      html += `<div class="mt-4 pt-2 border-t border-slate-100 text-xs italic text-slate-400 font-sans">Source: ${passage.source}</div>`;
+
+      container.innerHTML = html;
+      container.scrollTop = 0;
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[currentIdx];
+      const passage = getPassageForQuestion(currentIdx);
+      renderPassage(passage);
+
+      document.getElementById('currentQBadge').textContent = `${currentIdx + 1}/50`;
+      document.getElementById('questionNumberHeader').textContent = `Question ${currentIdx + 1} of 50`;
+      document.getElementById('questionText').textContent = `${currentIdx + 1}. ${q.q}`;
+
+      const flagBtn = document.getElementById('flagBtn');
+      const flagText = document.getElementById('flagBtnText');
+      if (flagged[currentIdx]) {
+        flagBtn.classList.add('bg-amber-100', 'border-amber-400', 'text-amber-800', 'font-semibold');
+        flagText.textContent = 'Ditandai Ragu-ragu';
+      } else {
+        flagBtn.classList.remove('bg-amber-100', 'border-amber-400', 'text-amber-800', 'font-semibold');
+        flagText.textContent = 'Tandai Ragu-ragu';
+      }
+
+      const letters = ['A', 'B', 'C', 'D'];
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((optText, optIdx) => {
+        const isSelected = userAnswers[currentIdx] === optIdx;
+        const isCorrect = q.correct === optIdx;
+
+        let cardStyle = 'border-slate-300 bg-white hover:border-blue-400 hover:bg-blue-50/40';
+        let badgeStyle = 'bg-slate-100 text-slate-700 border-slate-300';
+
+        if (!isReviewMode) {
+          if (isSelected) {
+            cardStyle = 'border-blue-600 bg-blue-50 ring-1 ring-blue-600';
+            badgeStyle = 'bg-blue-600 text-white border-blue-600';
+          }
+        } else {
+          if (isCorrect) {
+            cardStyle = 'border-emerald-600 bg-emerald-50 ring-1 ring-emerald-600';
+            badgeStyle = 'bg-emerald-600 text-white border-emerald-600';
+          } else if (isSelected && !isCorrect) {
+            cardStyle = 'border-rose-500 bg-rose-50 ring-1 ring-rose-500';
+            badgeStyle = 'bg-rose-600 text-white border-rose-600';
+          } else {
+            cardStyle = 'border-slate-200 bg-white opacity-75';
+          }
+        }
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.disabled = isReviewMode;
+        btn.onclick = () => selectOption(optIdx);
+        btn.className = `w-full text-left p-3.5 rounded-xl border transition flex items-start gap-3 ${cardStyle}`;
+        btn.innerHTML = `
+          <span class="w-7 h-7 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${badgeStyle}">
+            ${letters[optIdx]}
+          </span>
+          <span class="text-sm sm:text-base text-slate-800 leading-snug">${optText}</span>
+        `;
+        optionsContainer.appendChild(btn);
+      });
+
+      const expBox = document.getElementById('reviewExplanationBox');
+      if (isReviewMode) {
+        const userAns = userAnswers[currentIdx];
+        const statusText = userAns === null
+          ? '<span class="text-slate-600 font-bold">Tidak Dijawab</span>'
+          : (userAns === q.correct
+              ? '<span class="text-emerald-700 font-bold">✓ Jawaban Anda Benar</span>'
+              : `<span class="text-rose-700 font-bold">✕ Jawaban Anda: (${letters[userAns]}) — Kunci: (${letters[q.correct]})</span>`);
+
+        expBox.classList.remove('hidden');
+        expBox.className = `mt-6 p-4 rounded-xl border text-sm ${userAns === q.correct ? 'bg-emerald-50/70 border-emerald-200' : 'bg-amber-50/80 border-amber-200'}`;
+        expBox.innerHTML = `
+          <div class="mb-1.5">${statusText}</div>
+          <p class="text-slate-700 leading-relaxed">${q.explanation}</p>
+        `;
+      } else {
+        expBox.classList.add('hidden');
+      }
+
+      document.getElementById('prevBtn').disabled = (currentIdx === 0);
+      const nextBtn = document.getElementById('nextBtn');
+      if (currentIdx === 49) {
+        nextBtn.textContent = isReviewMode ? 'Selesai Review' : 'Selesai & Kumpulkan';
+        nextBtn.onclick = isReviewMode ? showResults : confirmSubmit;
+      } else {
+        nextBtn.textContent = 'Berikutnya →';
+        nextBtn.onclick = nextQuestion;
+      }
+    }
+
+    function selectOption(optIdx) {
+      if (isReviewMode) return;
+      userAnswers[currentIdx] = optIdx;
+      updateAnsweredCount();
+      renderQuestion();
+    }
+
+    function toggleFlag() {
+      flagged[currentIdx] = !flagged[currentIdx];
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentIdx > 0) {
+        currentIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentIdx < 49) {
+        currentIdx++;
+        renderQuestion();
+      }
+    }
+
+    function updateAnsweredCount() {
+      const count = userAnswers.filter(a => a !== null).length;
+      document.getElementById('answeredCount').textContent = count;
+    }
+
+    function toggleQuestionGrid() {
+      const modal = document.getElementById('gridModal');
+      if (modal.classList.contains('hidden')) {
+        renderQuestionGrid();
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function renderQuestionGrid() {
+      const container = document.getElementById('questionGridContainer');
+      container.innerHTML = '';
+      for (let i = 0; i < 50; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i + 1;
+        let cls = 'bg-slate-100 text-slate-700 hover:bg-slate-200';
+        if (i === currentIdx) {
+          cls = 'bg-blue-600 text-white font-bold ring-2 ring-blue-300';
+        } else if (isReviewMode) {
+          cls = (userAnswers[i] === QUESTIONS[i].correct)
+            ? 'bg-emerald-500 text-white font-semibold'
+            : 'bg-rose-500 text-white font-semibold';
+        } else if (flagged[i]) {
+          cls = 'bg-amber-400 text-slate-900 font-semibold';
+        } else if (userAnswers[i] !== null) {
+          cls = 'bg-emerald-500 text-white font-semibold';
+        }
+        btn.className = `h-8 rounded text-xs transition ${cls}`;
+        btn.onclick = () => {
+          currentIdx = i;
+          renderQuestion();
+          toggleQuestionGrid();
+        };
+        container.appendChild(btn);
+      }
+    }
+
+    function confirmSubmit() {
+      const unanswered = userAnswers.filter(a => a === null).length;
+      const msg = unanswered > 0
+        ? `Masih ada ${unanswered} soal yang belum dijawab. Apakah Anda yakin ingin mengakhiri simulasi dan melihat skor?`
+        : `Semua 50 soal sudah terjawab. Kumpulkan jawaban sekarang?`;
+      if (confirm(msg)) {
+        submitExam();
+      }
+    }
+
+    function submitExam() {
+      clearInterval(timerInterval);
+      isReviewMode = true;
+      showResults();
+    }
+
+    function showResults() {
+      document.getElementById('examScreen').classList.add('hidden');
+      document.getElementById('examScreen').classList.remove('flex');
+      document.getElementById('resultScreen').classList.remove('hidden');
+      document.getElementById('finishBtn').classList.add('hidden');
+      document.getElementById('pauseBtn').classList.add('hidden');
+
+      let correct = 0;
+      let wrong = 0;
+      QUESTIONS.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) correct++;
+        else wrong++;
+      });
+
+      const scaledScore = TOEFL_READING_SCALE[correct];
+      const accuracy = Math.round((correct / 50) * 100);
+
+      document.getElementById('scaledScoreDisplay').textContent = scaledScore;
+      document.getElementById('correctCountDisplay').textContent = correct;
+      document.getElementById('wrongCountDisplay').textContent = wrong;
+      document.getElementById('accuracyDisplay').textContent = `${accuracy}%`;
+
+      if (!isUntimed) {
+        const spent = totalDuration - timeLeft;
+        const m = Math.floor(spent / 60);
+        const s = spent % 60;
+        document.getElementById('timeSpentText').textContent = `Waktu pengerjaan: ${m} menit ${s} detik`;
+      } else {
+        document.getElementById('timeSpentText').textContent = `Mode Latihan Santai (Tanpa batas waktu)`;
+      }
+
+      const breakdownContainer = document.getElementById('passageBreakdown');
+      breakdownContainer.innerHTML = '';
+      PASSAGES.forEach((p, pIdx) => {
+        const start = pIdx * 10;
+        let pCorrect = 0;
+        for (let i = start; i < start + 10; i++) {
+          if (userAnswers[i] === QUESTIONS[i].correct) pCorrect++;
+        }
+        breakdownContainer.innerHTML += `
+          <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+            <div class="font-bold text-slate-800">Passage ${p.id}</div>
+            <div class="text-slate-500 truncate mb-1">${p.title}</div>
+            <div class="text-sm font-extrabold ${pCorrect >= 7 ? 'text-emerald-600' : (pCorrect >= 5 ? 'text-amber-600' : 'text-rose-600')}">
+              ${pCorrect} / 10 Benar
+            </div>
+          </div>
+        `;
+      });
+
+      filterReview('all');
+    }
+
+    function filterReview(type) {
+      const list = document.getElementById('reviewListContainer');
+      list.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      QUESTIONS.forEach((q, idx) => {
+        const userAns = userAnswers[idx];
+        const isCorrect = userAns === q.correct;
+        if (type === 'wrong' && isCorrect) return;
+        if (type === 'correct' && !isCorrect) return;
+
+        const userText = userAns !== null ? `(${letters[userAns]}) ${q.options[userAns]}` : 'Tidak dijawab';
+        const correctText = `(${letters[q.correct]}) ${q.options[q.correct]}`;
+
+        const item = document.createElement('div');
+        item.className = `p-4 rounded-xl border ${isCorrect ? 'border-emerald-200 bg-emerald-50/40' : 'border-rose-200 bg-rose-50/40'}`;
+        item.innerHTML = `
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="font-semibold text-slate-900 text-sm">${idx + 1}. ${q.q}</div>
+            <button onclick="enterReviewMode(${idx})" class="text-xs bg-white border border-slate-300 hover:bg-slate-100 px-2.5 py-1 rounded font-medium shrink-0 text-blue-600">
+              Lihat Teks
+            </button>
+          </div>
+          <div class="text-xs space-y-1 mb-2">
+            <div>Jawaban Anda: <strong class="${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">${userText}</strong></div>
+            ${!isCorrect ? `<div>Kunci Jawaban: <strong class="text-emerald-700">${correctText}</strong></div>` : ''}
+          </div>
+          <p class="text-xs text-slate-600 bg-white/80 p-2.5 rounded border border-slate-200/80">${q.explanation}</p>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function enterReviewMode(qIdx) {
+      isReviewMode = true;
+      currentIdx = qIdx;
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('examScreen').classList.remove('hidden');
+      document.getElementById('examScreen').classList.add('flex');
+      document.getElementById('backToResultBtn').classList.remove('hidden');
+      renderQuestion();
+    }
+
+    function resetExam() {
+      clearInterval(timerInterval);
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('examScreen').classList.add('hidden');
+      document.getElementById('examControls').classList.add('hidden');
+      document.getElementById('startScreen').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
